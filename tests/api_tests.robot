@@ -2,20 +2,19 @@
 Library    RequestsLibrary
 
 *** Variables ***
-${BASE_URL}    http://localhost:5000
+${BASE_URL}    http://127.0.0.1:5000    # Change to http://<VM_WITH_API_IP>:5000 if API runs on another VM
 
 *** Test Cases ***
-Check Home Endpoint
-    Create Session    myapi    ${BASE_URL}
-    ${resp}=    GET    myapi    /
-    Should Be Equal As Strings    ${resp.status_code}    200
-    ${json}=    Evaluate    ${resp.json()}
-    Should Be Equal As Strings    ${json["message"]}    Hello, CI/CD World!
+Home Should Say Hello
+    Create Session    api    ${BASE_URL}
+    ${resp}=    GET On Session    api    /
+    Status Should Be    200    ${resp}
+    ${body}=    Set Variable    ${resp.json()}
+    Should Be Equal As Strings    ${body['message']}    Hello, CI/CD World!
 
-Check Health Endpoint
-    Create Session    myapi    ${BASE_URL}
-    ${resp}=    GET    myapi    /health
-    Should Be Equal As Strings    ${resp.status_code}    200
-    ${json}=    Evaluate    ${resp.json()}
-    Should Be Equal As Strings    ${json["status"]}    OK
-
+Health Should Be OK
+    Create Session    api    ${BASE_URL}
+    ${resp}=    GET On Session    api    /health
+    Status Should Be    200    ${resp}
+    ${body}=    Set Variable    ${resp.json()}
+    Should Be Equal As Strings    ${body['status']}    OK
